@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_scanner/qr_scanner.dart';
 
 void main() {
@@ -38,6 +39,7 @@ class _MyAppState extends State<MyApp> {
                 height: 40,
                 child: RaisedButton(
                   onPressed: () async {
+                    // if (!await checkCameraPermission())  return;
                     _result = await QrScanner.scan();
                     setState(() {});
                   },
@@ -52,8 +54,10 @@ class _MyAppState extends State<MyApp> {
                 height: 40,
                 child: RaisedButton(
                   onPressed: () async {
-                    _result = await QrScanner.pickImage();
-                    setState(() {});
+                    if (await checkStoragePermission()) {
+                      _result = await QrScanner.pickImage();
+                      setState(() {});
+                    }
                   },
                   color: Theme.of(context).primaryColor,
                   textColor: Colors.white,
@@ -98,4 +102,22 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+  /// 检查拍照权限
+  Future<bool> checkCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+    }
+    return status.isGranted;
+  }
+
+  /// 检查存储权限
+  Future<bool> checkStoragePermission() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+    }
+    return status.isGranted;
+  }
+
 }
