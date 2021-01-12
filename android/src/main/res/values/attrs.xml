@@ -4,6 +4,7 @@
         <attr name="frameColor" format="color" />
         <attr name="cornerColor" format="color"/>
         <attr name="laserColor" format="color"/>
+        <attr name="resultPointColor" format="color"/>
         <attr name="labelText" format="string"/>
         <attr name="labelTextColor" format="color"/>
         <attr name="labelTextSize" format="dimension"/>
@@ -12,6 +13,7 @@
             <enum name="top" value="0"/>
             <enum name="bottom" value="1"/>
         </attr>
+        <attr name="showResultPoint" format="boolean"/>
         <attr name="frameWidth" format="dimension"/>
         <attr name="frameHeight" format="dimension"/>
         <attr name="gridColumn" format="integer"/>

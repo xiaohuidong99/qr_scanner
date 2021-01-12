@@ -24,7 +24,11 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.google.zxing.ResultPoint;
 import com.vincent.qr_scanner.R;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder rectangle and partial
@@ -37,6 +41,7 @@ public class ViewfinderView extends View {
     private static final int CURRENT_POINT_OPACITY = 0xA0;
     private static final int MAX_RESULT_POINTS = 20;
     private static final int POINT_SIZE = 30;
+    private static final int OPAQUE = 0xFF;
 
     /**
      * 画笔
@@ -63,10 +68,10 @@ public class ViewfinderView extends View {
      * 扫码框四角颜色
      */
     private int cornerColor;
-//    /**
-//     * 结果点颜色
-//     */
-//    private int resultPointColor;
+    /**
+     * 结果点颜色
+     */
+    private int resultPointColor;
 
     /**
      * 提示文本与扫码框的边距
@@ -172,10 +177,6 @@ public class ViewfinderView extends View {
      * 扫码框对齐方式
      */
     private FrameGravity frameGravity;
-    /**
-     * 是否展示小圆点
-     */
-    private boolean isCircle = true;
 
 
     private Point point;
@@ -184,7 +185,8 @@ public class ViewfinderView extends View {
 
     private float pointRadius;
     private float pointStrokeRatio = 1.2f;
-
+    private Collection<ResultPoint> possibleResultPoints;
+    private Collection<ResultPoint> lastPossibleResultPoints;
 
     public enum LaserStyle{
         NONE(0),LINE(1),GRID(2);
@@ -263,7 +265,7 @@ public class ViewfinderView extends View {
         frameColor = array.getColor(R.styleable.ViewfinderView_frameColor, ContextCompat.getColor(context,R.color.viewfinder_frame));
         cornerColor = array.getColor(R.styleable.ViewfinderView_cornerColor, ContextCompat.getColor(context,R.color.viewfinder_corner));
         laserColor = array.getColor(R.styleable.ViewfinderView_laserColor, ContextCompat.getColor(context,R.color.viewfinder_laser));
-//        resultPointColor = array.getColor(R.styleable.ViewfinderView_resultPointColor, ContextCompat.getColor(context,R.color.viewfinder_result_point_color));
+        resultPointColor = array.getColor(R.styleable.ViewfinderView_resultPointColor, ContextCompat.getColor(context,R.color.viewfinder_result_point_color));
 
         labelText = array.getString(R.styleable.ViewfinderView_labelText);
         labelTextColor = array.getColor(R.styleable.ViewfinderView_labelTextColor, ContextCompat.getColor(context,R.color.viewfinder_text_color));
@@ -271,7 +273,7 @@ public class ViewfinderView extends View {
         labelTextPadding = array.getDimension(R.styleable.ViewfinderView_labelTextPadding,TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,getResources().getDisplayMetrics()));
         labelTextLocation = TextLocation.getFromInt(array.getInt(R.styleable.ViewfinderView_labelTextLocation,0));
 
-//        isShowResultPoint = array.getBoolean(R.styleable.ViewfinderView_showResultPoint,false);
+        isShowResultPoint = array.getBoolean(R.styleable.ViewfinderView_showResultPoint,true);
 
         frameWidth = array.getDimensionPixelSize(R.styleable.ViewfinderView_frameWidth,0);
         frameHeight = array.getDimensionPixelSize(R.styleable.ViewfinderView_frameHeight,0);
@@ -296,6 +298,7 @@ public class ViewfinderView extends View {
 
         pointColor = laserColor;
         pointStrokeColor = Color.WHITE;
+        possibleResultPoints = new HashSet<>(5);
 
         pointRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,10,getResources().getDisplayMetrics());
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -387,6 +390,8 @@ public class ViewfinderView extends View {
         drawCorner(canvas, frame);
         //绘制提示信息
         drawTextInfo(canvas, frame);
+        // 绘制结果点
+        drawResultPoints(canvas, frame);
         // 间隔更新取景区域
         postInvalidateDelayed(scannerAnimationDelay, frame.left, frame.top, frame.right, frame.bottom);
     }
@@ -556,6 +561,39 @@ public class ViewfinderView extends View {
         }
     }
 
+    /**
+     * 绘制扫描反馈点
+     * @param canvas
+     * @param frame
+     */
+    private void drawResultPoints(Canvas canvas, Rect frame) {
+//        Collection<ResultPoint> currentPossible = possibleResultPoints;
+//        Collection<ResultPoint> currentLast = lastPossibleResultPoints;
+//        if (currentPossible.isEmpty()) {
+//            lastPossibleResultPoints = null;
+//        } else {
+//            possibleResultPoints = new HashSet<ResultPoint>(5);
+//            lastPossibleResultPoints = currentPossible;
+//            paint.setAlpha(OPAQUE);
+//            paint.setColor(resultPointColor);
+//
+//            for (ResultPoint point : currentPossible) {
+//                canvas.drawCircle(frame.left + point.getX(), frame.top + point.getY(), 6.0f, paint);
+//            }
+//        }
+//        if (currentLast != null) {
+//            paint.setAlpha(OPAQUE / 2);
+//            paint.setColor(resultPointColor);
+//
+//            for (ResultPoint point : currentLast) {
+//                canvas.drawCircle(frame.left + point.getX(), frame.top + point.getY(), 3.0f, paint);
+//            }
+//        }
+    }
+
+    public void addPossibleResultPoint(ResultPoint point) {
+        possibleResultPoints.add(point);
+    }
 
     public void drawViewfinder() {
         invalidate();

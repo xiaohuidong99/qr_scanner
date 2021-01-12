@@ -7,7 +7,7 @@
 pubspec.yaml
 ```yaml
 dependencies:
-  m3u8_downloader:
+  qr_scanner:
     git:
       url: https://github.com/lytian/qr_scanner.git
 ```

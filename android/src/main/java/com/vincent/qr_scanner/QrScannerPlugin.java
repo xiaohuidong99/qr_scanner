@@ -1,18 +1,21 @@
 package com.vincent.qr_scanner;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.zxing.BarcodeFormat;
 import com.vincent.qr_scanner.camera.CameraScan;
 import com.vincent.qr_scanner.decoder.CodeReader;
 import com.vincent.qr_scanner.encoder.CodeCreator;
-import com.google.zxing.BarcodeFormat;
-import com.vincent.qr_scanner.utils.ImageUtil;
+import com.vincent.qr_scanner.utils.PermissionUtils;
+import com.vincent.qr_scanner.utils.UriUtils;
 
 import java.io.ByteArrayOutputStream;
 
@@ -49,6 +52,11 @@ public class QrScannerPlugin implements FlutterPlugin, MethodCallHandler, Activi
         this.result = result;
         break;
       case "pickImage":
+        if(!PermissionUtils.checkPermission(activity.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)){
+          PermissionUtils.requestPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE, 1);
+          result.success(null);
+          return;
+        }
         Intent imgIntent = new Intent();
         imgIntent.setAction(Intent.ACTION_PICK);
         imgIntent.setType("image/*");
@@ -56,6 +64,11 @@ public class QrScannerPlugin implements FlutterPlugin, MethodCallHandler, Activi
         this.result = result;
         break;
       case "scanPath":
+        if(!PermissionUtils.checkPermission(activity.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)){
+          PermissionUtils.requestPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE, 1);
+          result.success(null);
+          return;
+        }
         String path = call.argument("path");
         result.success(CodeReader.parseCode(path));
         break;
@@ -111,10 +124,9 @@ public class QrScannerPlugin implements FlutterPlugin, MethodCallHandler, Activi
         this.result.success(result);
         return true;
       } else if (requestCode == REQUEST_IMAGE) {
-        Uri uri = data.getData();
-        String path = ImageUtil.getImageAbsolutePath(activity, uri);
+        final String path = UriUtils.getImagePath(activity.getApplicationContext(), data);
         String code = CodeReader.parseCode(path);
-        this.result.success(code);
+        result.success(code);
         return true;
       }
     }

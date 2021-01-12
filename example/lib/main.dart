@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_scanner/qr_scanner.dart';
 
 void main() {
@@ -39,7 +37,6 @@ class _MyAppState extends State<MyApp> {
                 height: 40,
                 child: RaisedButton(
                   onPressed: () async {
-                    // if (!await checkCameraPermission())  return;
                     _result = await QrScanner.scan();
                     setState(() {});
                   },
@@ -54,10 +51,9 @@ class _MyAppState extends State<MyApp> {
                 height: 40,
                 child: RaisedButton(
                   onPressed: () async {
-                    if (await checkStoragePermission()) {
-                      _result = await QrScanner.pickImage();
-                      setState(() {});
-                    }
+                    _result = await QrScanner.pickImage();
+                    // _result = await QrScanner.scanPath('/storage/emulated/0/Pictures/WeiXin/1mmexport30422518a2abd975f99a061b1a05b57c.png');
+                    setState(() {});
                   },
                   color: Theme.of(context).primaryColor,
                   textColor: Colors.white,
@@ -70,7 +66,7 @@ class _MyAppState extends State<MyApp> {
                 height: 40,
                 child: RaisedButton(
                   onPressed: () async {
-                    _bytes = await QrScanner.createBarCode('12345678', width: 400, height: 40, showText: false);
+                    _bytes = await QrScanner.createBarCode('123456789', width: 400, height: 40, showText: false);
                     setState(() {});
                   },
                   color: Theme.of(context).primaryColor,
@@ -102,22 +98,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-  /// 检查拍照权限
-  Future<bool> checkCameraPermission() async {
-    var status = await Permission.camera.status;
-    if (!status.isGranted) {
-      status = await Permission.camera.request();
-    }
-    return status.isGranted;
-  }
-
-  /// 检查存储权限
-  Future<bool> checkStoragePermission() async {
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      status = await Permission.storage.request();
-    }
-    return status.isGranted;
-  }
-
 }

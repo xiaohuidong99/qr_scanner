@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'qr_scanner'
   s.version          = '0.0.1'
-  s.summary          = '二维码、条形码扫描插件'
+  s.summary          = 'A new Flutter plugin.'
   s.description      = <<-DESC
-二维码、条形码扫描插件
+A new Flutter plugin.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
